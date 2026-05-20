@@ -1,0 +1,16 @@
+name: guestbook-monitoring
+description: Kubernetes Guestbook with Prometheus and Grafana monitoring via Pulumi
+runtime:
+  name: nodejs
+  options:
+    typescript: true
+config:
+  isMinikube:
+    type: boolean
+    default: false
+  namespace:
+    type: string
+    default: guestbook
+  grafanaPassword:
+    type: string
+    secret: true

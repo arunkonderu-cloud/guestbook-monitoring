@@ -1,0 +1,120 @@
+﻿{
+  "title": "Guestbook Application Monitoring",
+  "uid": "guestbook-monitoring-v1",
+  "schemaVersion": 38,
+  "refresh": "30s",
+  "time": { "from": "now-30m", "to": "now" },
+  "tags": ["guestbook", "kubernetes", "redis", "nginx"],
+  "panels": [
+    {
+      "id": 1,
+      "title": "Frontend - nginx Request Rate (req/s)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{
+        "expr": "sum(rate(nginx_http_requests_total{kubernetes_namespace=\"guestbook\", app=\"frontend\"}[2m])) by (kubernetes_pod_name)",
+        "legendFormat": "{{kubernetes_pod_name}}",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 2,
+      "title": "Frontend - nginx Active Connections",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "nginx_connections_active{kubernetes_namespace=\"guestbook\", app=\"frontend\"}",
+          "legendFormat": "active - {{kubernetes_pod_name}}",
+          "refId": "A"
+        },
+        {
+          "expr": "nginx_connections_waiting{kubernetes_namespace=\"guestbook\", app=\"frontend\"}",
+          "legendFormat": "waiting - {{kubernetes_pod_name}}",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Redis - Commands Processed (ops/s)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{
+        "expr": "sum(rate(redis_commands_processed_total{kubernetes_namespace=\"guestbook\"}[2m])) by (app, kubernetes_pod_name)",
+        "legendFormat": "{{app}} - {{kubernetes_pod_name}}",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 4,
+      "title": "Redis - Connected Clients",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{
+        "expr": "redis_connected_clients{kubernetes_namespace=\"guestbook\"}",
+        "legendFormat": "{{app}} - {{kubernetes_pod_name}}",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 5,
+      "title": "Redis - Memory Used",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{
+        "expr": "redis_memory_used_bytes{kubernetes_namespace=\"guestbook\"}",
+        "legendFormat": "{{app}} - {{kubernetes_pod_name}}",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 6,
+      "title": "Redis - Keyspace Hits vs Misses",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "rate(redis_keyspace_hits_total{kubernetes_namespace=\"guestbook\"}[2m])",
+          "legendFormat": "hits - {{app}}",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(redis_keyspace_misses_total{kubernetes_namespace=\"guestbook\"}[2m])",
+          "legendFormat": "misses - {{app}}",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Pod CPU Usage (cores)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{
+        "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"guestbook\", container!=\"\", container!=\"POD\"}[2m])) by (pod, container)",
+        "legendFormat": "{{pod}} / {{container}}",
+        "refId": "A"
+      }]
+    },
+    {
+      "id": 8,
+      "title": "Pod Memory Usage (working set)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{
+        "expr": "sum(container_memory_working_set_bytes{namespace=\"guestbook\", container!=\"\", container!=\"POD\"}) by (pod, container)",
+        "legendFormat": "{{pod}} / {{container}}",
+        "refId": "A"
+      }]
+    }
+  ]
+}
